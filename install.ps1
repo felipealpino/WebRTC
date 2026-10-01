@@ -51,5 +51,11 @@ $shortcut.TargetPath = $exe
 $shortcut.WorkingDirectory = $dir
 $shortcut.Save()
 
-Write-Host "Pronto. O app vai subir sozinho no próximo login."
-Write-Host "Para transmitir agora, dê duplo clique em $exe (roda em segundo plano)."
+# Já inicia o app. Se já estiver rodando, não abre de novo.
+if (Get-Process webrtc -ErrorAction SilentlyContinue) {
+    Write-Host 'O app já está rodando.'
+} else {
+    Start-Process $exe -WorkingDirectory $dir
+    Write-Host 'App iniciado em segundo plano.'
+}
+Write-Host "Pronto. O link fica em $dir\webrtc.log. O app sobe sozinho no próximo login."
