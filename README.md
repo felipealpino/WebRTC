@@ -1,7 +1,7 @@
 # Transmissão de tela
 
 Transmite a tela de um PC Windows em tempo real (WebRTC, até 1080p a 30 fps) para quem abrir um link no navegador da rede local.
-No PC que transmite não aparece janela, seletor de tela nem aviso de compartilhamento, só um console com o link.
+No PC que transmite, o app roda em segundo plano: não aparece janela, console, seletor de tela nem aviso de compartilhamento.
 
 ## Uso no Windows
 
@@ -11,21 +11,21 @@ No PC que transmite não aparece janela, seletor de tela nem aviso de compartilh
 irm https://raw.githubusercontent.com/felipealpino/WebRTC/main/install.ps1 | iex
 ```
 
-O script ([install.ps1](install.ps1)) baixa o app para `C:\transmissao-tela`, libera o app no firewall e instala o WebView2 se faltar. Rode de novo para atualizar.
+O script ([install.ps1](install.ps1)) baixa o app e os scripts `stop-stream.ps1` e `uninstall.ps1` para `C:\transmissao-tela`, libera o app no firewall e instala o WebView2 se faltar. Rode de novo para atualizar.
 
-**2. Transmitir.** Rode o comando abaixo (ou dê duplo clique no `.exe`):
+**2. Transmitir.** Dê duplo clique em `C:\transmissao-tela\transmissao-tela.exe`. O app roda em segundo plano.
 
-```powershell
-C:\transmissao-tela\transmissao-tela.exe
-```
-
-O console mostra o link, por exemplo `http://192.168.0.50:8080`. Pode minimizar o console. Para parar, use Ctrl+C ou feche o console.
+O link fica em `C:\transmissao-tela\transmissao.log`, por exemplo `http://192.168.0.50:8080`.
 
 **3. Assistir.** Em qualquer Mac ou Windows da rede, abra o link no Chrome, Edge ou Safari. Duplo clique no vídeo põe em tela cheia.
 
+**4. Parar.** Em `C:\transmissao-tela`, clique com o botão direito em `stop-stream.ps1` e escolha "Executar com o PowerShell".
+
+**Desinstalar.** Em `C:\transmissao-tela`, clique com o botão direito em `uninstall.ps1` e escolha "Executar com o PowerShell". O script remove a pasta, as regras de firewall e os dados do app.
+
 ## Configuração (opcional)
 
-Defina as variáveis no PowerShell antes de rodar:
+Defina as variáveis no PowerShell e abra o app pelo mesmo PowerShell:
 
 ```powershell
 $env:PORT = "8080"; $env:FPS = "30"; $env:BITRATE_MBPS = "8"; C:\transmissao-tela\transmissao-tela.exe
@@ -38,10 +38,10 @@ $env:PORT = "8080"; $env:FPS = "30"; $env:BITRATE_MBPS = "8"; C:\transmissao-tel
 
 ## Problemas comuns
 
-- **`Erro ao capturar a tela…` no console:** a mensagem diz o motivo. O app tenta de novo a cada 5 s.
+- **`Erro ao capturar a tela…` no `transmissao.log`:** a mensagem diz o motivo. O app tenta de novo a cada 5 s.
 - **Quem assiste fica em "Conectando…":** confira se os PCs estão na mesma rede e se o firewall foi liberado (rode o `install.ps1` de novo).
-- **Quem assiste fica em "Aguardando transmissão…":** o app não está rodando, ou a captura falhou. Veja o console.
-- **`Não foi possível usar a porta 8080`:** outro programa usa a porta. Feche-o ou use `$env:PORT`.
+- **Quem assiste fica em "Aguardando transmissão…":** o app não está rodando, ou a captura falhou. Veja o `transmissao.log`.
+- **`Não foi possível usar a porta 8080` no `transmissao.log`:** o app já está rodando, ou outro programa usa a porta. Rode o `stop-stream.ps1` ou use `$env:PORT`.
 
 ## Estrutura
 
@@ -54,6 +54,8 @@ src-tauri/
   src/server.rs        servidor HTTP + WebSocket (sinalização WebRTC)
   tauri.conf.json      configuração do Tauri
 install.ps1            instalador para Windows
+stop-stream.ps1        para a transmissão
+uninstall.ps1          remove o app e tudo que a instalação criou
 .github/workflows/     build do .exe a cada push na main, publicado na release "latest"
 ```
 

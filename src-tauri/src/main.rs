@@ -1,7 +1,25 @@
 // Transmissor: no Windows, abre um WebView2 oculto que captura a tela inteira e transmite via WebRTC.
-// Sem janela, sem ícone na barra de tarefas, sem seletor de tela e sem aviso de compartilhamento.
-// O console fica aberto só para mostrar o link; fechar o console (ou Ctrl+C) encerra a transmissão.
+// Roda em segundo plano: sem console, janela, ícone, seletor de tela ou aviso de compartilhamento.
+// O link e os erros vão para transmissao.log, ao lado do .exe. Para parar: stop-stream.ps1.
+#![cfg_attr(windows, windows_subsystem = "windows")]
+
+macro_rules! log {
+    ($($arg:tt)*) => { crate::write_log(&format!($($arg)*)) };
+}
+
 mod server;
+
+fn log_path() -> std::path::PathBuf {
+    std::env::current_exe().expect("caminho do .exe").with_file_name("transmissao.log")
+}
+
+fn write_log(msg: &str) {
+    use std::io::Write;
+    println!("{msg}");
+    if let Ok(mut file) = std::fs::OpenOptions::new().create(true).append(true).open(log_path()) {
+        let _ = writeln!(file, "{msg}");
+    }
+}
 
 // Flags do WebView2 (Chromium):
 // - use-fake-ui-for-media-stream: aceita a captura da tela inteira sem seletor nem aviso.
@@ -17,8 +35,15 @@ const BROWSER_ARGS: &str = "--use-fake-ui-for-media-stream \
 fn main() {
     let config = server::Config::from_env();
     let port = config.port;
-    let listener = std::net::TcpListener::bind(("0.0.0.0", port))
-        .unwrap_or_else(|e| panic!("Não foi possível usar a porta {port}: {e}"));
+    let listener = match std::net::TcpListener::bind(("0.0.0.0", port)) {
+        Ok(listener) => listener,
+        Err(e) => {
+            log!("Não foi possível usar a porta {port} (o app já está rodando?): {e}");
+            std::process::exit(1);
+        }
+    };
+    // Só limpa o log depois de garantir a porta, para não apagar o log de outra cópia já rodando.
+    let _ = std::fs::remove_file(log_path());
 
     tauri::Builder::default()
         .setup(move |app| {
@@ -36,7 +61,7 @@ fn main() {
             #[cfg(not(windows))]
             {
                 let _ = app;
-                println!("Fora do Windows não há captura automática: para transmitir, abra http://localhost:{port}/broadcast no Chrome.");
+                log!("Fora do Windows não há captura automática: para transmitir, abra http://localhost:{port}/broadcast no Chrome.");
             }
             Ok(())
         })

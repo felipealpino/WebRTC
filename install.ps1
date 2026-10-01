@@ -18,8 +18,13 @@ if (-not $hasWebView2) {
 }
 
 Write-Host 'Baixando o app...'
+# Para uma cópia já rodando, senão o .exe fica travado e não é atualizado.
+Get-Process transmissao-tela -ErrorAction SilentlyContinue | Stop-Process -Force
 New-Item -ItemType Directory -Force $dir | Out-Null
 Invoke-WebRequest 'https://github.com/felipealpino/WebRTC/releases/download/latest/transmissao-tela.exe' -OutFile $exe
+foreach ($script in 'stop-stream.ps1', 'uninstall.ps1') {
+    Invoke-WebRequest "https://raw.githubusercontent.com/felipealpino/WebRTC/main/$script" -OutFile (Join-Path $dir $script)
+}
 
 if (-not (Get-NetFirewallRule -DisplayName 'Transmissao de tela' -ErrorAction SilentlyContinue)) {
     New-NetFirewallRule -DisplayName 'Transmissao de tela' -Direction Inbound -Program $exe -Action Allow | Out-Null
@@ -29,4 +34,4 @@ if (-not (Get-NetFirewallRule -DisplayName 'Transmissao de tela (WebRTC)' -Error
     New-NetFirewallRule -DisplayName 'Transmissao de tela (WebRTC)' -Direction Inbound -Protocol UDP -RemoteAddress LocalSubnet -Action Allow | Out-Null
 }
 
-Write-Host "Pronto. Para transmitir, rode: $exe"
+Write-Host "Pronto. Para transmitir, dê duplo clique em $exe (roda em segundo plano)."

@@ -62,7 +62,7 @@ enum Role {
 pub async fn run(listener: TcpListener, config: Config) {
     listener.set_nonblocking(true).unwrap();
     let listener = tokio::net::TcpListener::from_std(listener).unwrap();
-    println!("Para assistir, abra no navegador: http://{}:{}", lan_ip(), config.port);
+    log!("Para assistir, abra no navegador: http://{}:{}", lan_ip(), config.port);
 
     let state = AppState {
         room: Default::default(),
@@ -100,7 +100,7 @@ fn lan_ip() -> String {
 // A página do transmissor roda oculta; ela manda o status para aparecer no console.
 async fn log_handler(ConnectInfo(addr): ConnectInfo<SocketAddr>, body: String) {
     if addr.ip().is_loopback() {
-        println!("[transmissor] {body}");
+        log!("[transmissor] {body}");
     }
 }
 
@@ -150,14 +150,14 @@ async fn handle_socket(mut socket: WebSocket, is_local: bool, room: Arc<Mutex<Ro
             if let Some((_, b)) = &r.broadcaster {
                 send(b, json!({ "type": "viewer-left", "id": id }));
             }
-            println!("Espectadores: {}", r.viewers.len());
+            log!("Espectadores: {}", r.viewers.len());
         }
         Role::Broadcaster if r.broadcaster.as_ref().is_some_and(|(bid, _)| *bid == id) => {
             r.broadcaster = None;
             for v in r.viewers.values() {
                 send(v, json!({ "type": "broadcaster-left" }));
             }
-            println!("Transmissão parada.");
+            log!("Transmissão parada.");
         }
         _ => {}
     }
@@ -179,7 +179,7 @@ fn handle_message(msg: &Value, id: u64, role: &mut Role, is_local: bool, tx: &Tx
                 send(tx, json!({ "type": "viewer-joined", "id": viewer_id }));
             }
             *role = Role::Broadcaster;
-            println!("Transmissão iniciada.");
+            log!("Transmissão iniciada.");
         }
         (Role::None, Some("viewer")) => {
             r.viewers.insert(id, tx.clone());
@@ -188,7 +188,7 @@ fn handle_message(msg: &Value, id: u64, role: &mut Role, is_local: bool, tx: &Tx
                 None => send(tx, json!({ "type": "broadcaster-left" })),
             }
             *role = Role::Viewer;
-            println!("Espectadores: {}", r.viewers.len());
+            log!("Espectadores: {}", r.viewers.len());
         }
         (Role::Broadcaster, Some("offer")) => {
             if let Some(v) = msg["to"].as_u64().and_then(|to| r.viewers.get(&to)) {
