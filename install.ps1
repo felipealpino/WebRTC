@@ -43,4 +43,13 @@ if (-not (Get-NetFirewallRule -DisplayName 'WebRTC (UDP)' -ErrorAction SilentlyC
     New-NetFirewallRule -DisplayName 'WebRTC (UDP)' -Direction Inbound -Protocol UDP -RemoteAddress LocalSubnet -Action Allow | Out-Null
 }
 
-Write-Host "Pronto. Para transmitir, dê duplo clique em $exe (roda em segundo plano)."
+# Inicia com o Windows: atalho na pasta Inicializar do usuário. O app sobe no login
+# (não antes), porque precisa da área de trabalho ativa para capturar a tela.
+$startup = Join-Path ([Environment]::GetFolderPath('Startup')) 'webrtc.lnk'
+$shortcut = (New-Object -ComObject WScript.Shell).CreateShortcut($startup)
+$shortcut.TargetPath = $exe
+$shortcut.WorkingDirectory = $dir
+$shortcut.Save()
+
+Write-Host "Pronto. O app vai subir sozinho no próximo login."
+Write-Host "Para transmitir agora, dê duplo clique em $exe (roda em segundo plano)."

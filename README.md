@@ -21,13 +21,7 @@ O link fica em `C:\webrtc\webrtc.log`, por exemplo `http://192.168.0.50:8080`.
 
 **4. Parar.** Em `C:\webrtc`, clique com o botão direito em `stop-stream.ps1` e escolha "Executar com o PowerShell".
 
-**Iniciar com o Windows (opcional).** Para o app abrir sozinho em segundo plano sempre que você entrar no Windows, rode no PowerShell:
-
-```powershell
-$s = (New-Object -ComObject WScript.Shell).CreateShortcut("$([Environment]::GetFolderPath('Startup'))\webrtc.lnk"); $s.TargetPath = 'C:\webrtc\webrtc.exe'; $s.WorkingDirectory = 'C:\webrtc'; $s.Save()
-```
-
-Isso cria um atalho na pasta Inicializar do usuário. O app sobe no login (não antes), porque precisa da área de trabalho para capturar a tela. Para desligar, apague o atalho:
+**Iniciar com o Windows.** A instalação já cria um atalho na pasta Inicializar do usuário, então o app sobe sozinho em segundo plano sempre que você entra no Windows (no login, não antes, porque precisa da área de trabalho para capturar a tela). Para desligar isso sem desinstalar, apague o atalho:
 
 ```powershell
 Remove-Item "$([Environment]::GetFolderPath('Startup'))\webrtc.lnk"
