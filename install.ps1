@@ -24,5 +24,9 @@ Invoke-WebRequest 'https://github.com/felipealpino/WebRTC/releases/download/late
 if (-not (Get-NetFirewallRule -DisplayName 'Transmissao de tela' -ErrorAction SilentlyContinue)) {
     New-NetFirewallRule -DisplayName 'Transmissao de tela' -Direction Inbound -Program $exe -Action Allow | Out-Null
 }
+# O vídeo sai pelo msedgewebview2.exe, em portas UDP aleatórias: libera UDP vindo só da rede local.
+if (-not (Get-NetFirewallRule -DisplayName 'Transmissao de tela (WebRTC)' -ErrorAction SilentlyContinue)) {
+    New-NetFirewallRule -DisplayName 'Transmissao de tela (WebRTC)' -Direction Inbound -Protocol UDP -RemoteAddress LocalSubnet -Action Allow | Out-Null
+}
 
 Write-Host "Pronto. Para transmitir, rode: $exe"
