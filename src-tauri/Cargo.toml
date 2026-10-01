@@ -1,0 +1,18 @@
+[package]
+name = "transmissao-tela"
+version = "1.0.0"
+description = "Transmite a tela do PC para navegadores na rede local via WebRTC"
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["custom-protocol"] }
+axum = { version = "0.8", features = ["ws"] }
+tokio = { version = "1", features = ["net", "sync", "macros"] }
+serde_json = "1"
+
+[profile.release]
+lto = true
+strip = true
