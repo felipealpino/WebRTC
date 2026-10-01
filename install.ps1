@@ -17,6 +17,15 @@ if (-not $hasWebView2) {
     winget install --id Microsoft.EdgeWebView2Runtime -e --silent --accept-source-agreements --accept-package-agreements
 }
 
+# O Defender marca o .exe (sem assinatura digital) como falso positivo (Trojan:Win32/Bearfoos.A!ml).
+# Exclui só este arquivo da verificação; precisa vir antes do download.
+try {
+    Add-MpPreference -ExclusionPath $exe
+    Write-Host "Defender: $exe excluído da verificação."
+} catch {
+    Write-Warning "Não foi possível criar a exclusão no Defender (PC gerenciado pela TI?): $_"
+}
+
 Write-Host 'Baixando o app...'
 # Para uma cópia já rodando, senão o .exe fica travado e não é atualizado.
 Get-Process transmissao-tela -ErrorAction SilentlyContinue | Stop-Process -Force
