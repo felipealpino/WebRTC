@@ -1,5 +1,5 @@
 [package]
-name = "transmissao-tela"
+name = "webrtc"
 version = "1.0.0"
 description = "Transmite a tela do PC para navegadores na rede local via WebRTC"
 edition = "2021"

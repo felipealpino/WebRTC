@@ -3702,17 +3702,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "transmissao-tela"
-version = "1.0.0"
-dependencies = [
- "axum",
- "serde_json",
- "tauri",
- "tauri-build",
- "tokio",
-]
-
-[[package]]
 name = "tray-icon"
 version = "0.25.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4032,6 +4021,17 @@ dependencies = [
  "pkg-config",
  "soup3-sys",
  "system-deps",
+]
+
+[[package]]
+name = "webrtc"
+version = "1.0.0"
+dependencies = [
+ "axum",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tokio",
 ]
 
 [[package]]

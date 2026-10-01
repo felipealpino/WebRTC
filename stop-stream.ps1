@@ -1,5 +1,5 @@
 ﻿# Para a transmissão. Clique com o botão direito e escolha "Executar com o PowerShell".
-$app = Get-Process transmissao-tela -ErrorAction SilentlyContinue
+$app = Get-Process webrtc -ErrorAction SilentlyContinue
 if ($app) {
     $app | Stop-Process -Force
     Write-Host 'Transmissão parada.'

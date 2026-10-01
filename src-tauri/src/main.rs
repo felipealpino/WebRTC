@@ -1,6 +1,6 @@
 // Transmissor: no Windows, abre um WebView2 oculto que captura a tela inteira e transmite via WebRTC.
 // Roda em segundo plano: sem console, janela, ícone, seletor de tela ou aviso de compartilhamento.
-// O link e os erros vão para transmissao.log, ao lado do .exe. Para parar: stop-stream.ps1.
+// O link e os erros vão para webrtc.log, ao lado do .exe. Para parar: stop-stream.ps1.
 #![cfg_attr(windows, windows_subsystem = "windows")]
 
 macro_rules! log {
@@ -10,7 +10,7 @@ macro_rules! log {
 mod server;
 
 fn log_path() -> std::path::PathBuf {
-    std::env::current_exe().expect("caminho do .exe").with_file_name("transmissao.log")
+    std::env::current_exe().expect("caminho do .exe").with_file_name("webrtc.log")
 }
 
 fn write_log(msg: &str) {

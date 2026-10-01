@@ -6,17 +6,18 @@ if (-not $identity.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrat
     return
 }
 
-$dir = 'C:\transmissao-tela'
+$dir = 'C:\webrtc'
 
-Get-Process transmissao-tela -ErrorAction SilentlyContinue | Stop-Process -Force
+Get-Process webrtc -ErrorAction SilentlyContinue | Stop-Process -Force
 Start-Sleep 1
 
-Remove-NetFirewallRule -DisplayName 'Transmissao de tela', 'Transmissao de tela (WebRTC)' -ErrorAction SilentlyContinue
-Remove-MpPreference -ExclusionPath $dir, "$dir\transmissao-tela.exe" -ErrorAction SilentlyContinue
+Remove-NetFirewallRule -DisplayName 'WebRTC', 'WebRTC (UDP)' -ErrorAction SilentlyContinue
+Remove-MpPreference -ExclusionPath $dir, "$dir\webrtc.exe" -ErrorAction SilentlyContinue
 
 # Sai da pasta antes de apagá-la.
 Set-Location $env:TEMP
-Remove-Item -Recurse -Force $dir, "$env:LOCALAPPDATA\com.felipealpino.transmissao-tela" -ErrorAction SilentlyContinue
+Remove-Item -Recurse -Force $dir, "$env:LOCALAPPDATA\com.felipealpino.webrtc" -ErrorAction SilentlyContinue
+Remove-Item "$([Environment]::GetFolderPath('Startup'))\webrtc.lnk" -ErrorAction SilentlyContinue
 
 Write-Host 'Transmissor de tela removido.'
 Start-Sleep 3

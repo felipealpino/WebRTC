@@ -11,24 +11,36 @@ No PC que transmite, o app roda em segundo plano: não aparece janela, console, 
 irm https://raw.githubusercontent.com/felipealpino/WebRTC/main/install.ps1 | iex
 ```
 
-O script ([install.ps1](install.ps1)) baixa o app e os scripts `stop-stream.ps1` e `uninstall.ps1` para `C:\transmissao-tela`, libera o app no firewall e instala o WebView2 se faltar. Rode de novo para atualizar.
+O script ([install.ps1](install.ps1)) baixa o app e os scripts `stop-stream.ps1` e `uninstall.ps1` para `C:\webrtc`, libera o app no firewall e instala o WebView2 se faltar. Rode de novo para atualizar.
 
-**2. Transmitir.** Dê duplo clique em `C:\transmissao-tela\transmissao-tela.exe`. O app roda em segundo plano.
+**2. Transmitir.** Dê duplo clique em `C:\webrtc\webrtc.exe`. O app roda em segundo plano.
 
-O link fica em `C:\transmissao-tela\transmissao.log`, por exemplo `http://192.168.0.50:8080`.
+O link fica em `C:\webrtc\webrtc.log`, por exemplo `http://192.168.0.50:8080`.
 
 **3. Assistir.** Em qualquer Mac ou Windows da rede, abra o link no Chrome, Edge ou Safari. Duplo clique no vídeo põe em tela cheia.
 
-**4. Parar.** Em `C:\transmissao-tela`, clique com o botão direito em `stop-stream.ps1` e escolha "Executar com o PowerShell".
+**4. Parar.** Em `C:\webrtc`, clique com o botão direito em `stop-stream.ps1` e escolha "Executar com o PowerShell".
 
-**Desinstalar.** Em `C:\transmissao-tela`, clique com o botão direito em `uninstall.ps1` e escolha "Executar com o PowerShell". O script remove a pasta, as regras de firewall e os dados do app.
+**Iniciar com o Windows (opcional).** Para o app abrir sozinho em segundo plano sempre que você entrar no Windows, rode no PowerShell:
+
+```powershell
+$s = (New-Object -ComObject WScript.Shell).CreateShortcut("$([Environment]::GetFolderPath('Startup'))\webrtc.lnk"); $s.TargetPath = 'C:\webrtc\webrtc.exe'; $s.WorkingDirectory = 'C:\webrtc'; $s.Save()
+```
+
+Isso cria um atalho na pasta Inicializar do usuário. O app sobe no login (não antes), porque precisa da área de trabalho para capturar a tela. Para desligar, apague o atalho:
+
+```powershell
+Remove-Item "$([Environment]::GetFolderPath('Startup'))\webrtc.lnk"
+```
+
+**Desinstalar.** Em `C:\webrtc`, clique com o botão direito em `uninstall.ps1` e escolha "Executar com o PowerShell". O script remove a pasta, o atalho de inicialização, as regras de firewall e os dados do app.
 
 ## Configuração (opcional)
 
 Defina as variáveis no PowerShell e abra o app pelo mesmo PowerShell:
 
 ```powershell
-$env:PORT = "8080"; $env:FPS = "30"; $env:BITRATE_MBPS = "8"; C:\transmissao-tela\transmissao-tela.exe
+$env:PORT = "8080"; $env:FPS = "30"; $env:BITRATE_MBPS = "8"; C:\webrtc\webrtc.exe
 ```
 
 - `PORT`: porta HTTP (padrão `8080`).
@@ -38,10 +50,10 @@ $env:PORT = "8080"; $env:FPS = "30"; $env:BITRATE_MBPS = "8"; C:\transmissao-tel
 
 ## Problemas comuns
 
-- **`Erro ao capturar a tela…` no `transmissao.log`:** a mensagem diz o motivo. O app tenta de novo a cada 5 s.
+- **`Erro ao capturar a tela…` no `webrtc.log`:** a mensagem diz o motivo. O app tenta de novo a cada 5 s.
 - **Quem assiste fica em "Conectando…":** confira se os PCs estão na mesma rede e se o firewall foi liberado (rode o `install.ps1` de novo).
-- **Quem assiste fica em "Aguardando transmissão…":** o app não está rodando, ou a captura falhou. Veja o `transmissao.log`.
-- **`Não foi possível usar a porta 8080` no `transmissao.log`:** o app já está rodando, ou outro programa usa a porta. Rode o `stop-stream.ps1` ou use `$env:PORT`.
+- **Quem assiste fica em "Aguardando transmissão…":** o app não está rodando, ou a captura falhou. Veja o `webrtc.log`.
+- **`Não foi possível usar a porta 8080` no `webrtc.log`:** o app já está rodando, ou outro programa usa a porta. Rode o `stop-stream.ps1` ou use `$env:PORT`.
 
 ## Estrutura
 

@@ -30,4 +30,4 @@ jobs:
         run: |
           gh release view latest >/dev/null 2>&1 || gh release create latest --title "Última versão" --notes ""
           gh release edit latest --notes "Build automático do commit ${GITHUB_SHA::7}."
-          gh release upload latest src-tauri/target/release/transmissao-tela.exe --clobber
+          gh release upload latest src-tauri/target/release/webrtc.exe --clobber
